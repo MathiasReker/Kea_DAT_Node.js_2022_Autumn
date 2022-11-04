@@ -16,6 +16,8 @@ app.use(contactRouter);
 
 import { renderPage, injectData } from "./util/templateEngine.js";
 
+import { mailer } from "./util/mailer.js"
+
 const frontpagePage = renderPage("/frontpage/frontpage.html", 
 { 
     tabTitle: "Pokemon", 
@@ -31,6 +33,7 @@ const battleResultsPage = renderPage("/battleResults/battleResults.html");
 const contactPage = renderPage("/contact/contact.html");
 
 app.get("/", (req, res) => {
+    sendMail();
     res.send(frontpagePage);
 });
 
@@ -67,4 +70,18 @@ const server = app.listen(PORT, (error) => {
 
 function addA(someString) {
     return someString + "A";
+}
+
+const sendMail = async () => {
+    const infoMail = {
+        from: '"app" <app@example.com>',
+        to: "app@example.com",
+        subject: "The frontpage was loaded...",
+        text: "A user has entered the front page",
+        html: "<p>A user has entered the front page</p>",
+    };
+
+    await mailer(infoMail).then(response => {
+        console.log(response.messageId || 'failed');
+    });
 }
